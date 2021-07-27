@@ -16,7 +16,8 @@ def hello():
 @app.route("/product")
 def product():
     diff=5000
-    product = input("상품을 입력하세요 : ")
+    product = "돼지고기"
+    # input("상품을 입력하세요 : ")
     if os.path.isfile("savedata/"+product+".save.txt"):
         mtime = os.path.getmtime("savedata/"+product+".save.txt")
         now=time.time()
