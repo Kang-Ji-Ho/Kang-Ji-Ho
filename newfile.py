@@ -12,7 +12,7 @@ app = Flask(__name__)
 app.config['JSON_AS_ASCII'] = False
 @app.route("/")
 def hello():
-    return "Hello World!"
+    return "Main!"
 @app.route("/product")
 def product():
     diff=5000
@@ -53,11 +53,6 @@ def product():
             product_pr.append(product_price)
             with open("savedata/"+product+".save.txt","a", encoding='utf-8') as f:
                 f.write("[%d] %s %s원\n" % (number+1, product_title, product_price))
-                # f.close
-            # else:
-            #     with open("savedata/"+product+".save.txt","w", encoding='utf-8') as f:
-            #         f.write("[%d] %s %s원\n" % (number+1, product_title, product_price))
-            #         f.close
             # ImgUrl0=a[number].replace("//","https://")
             # ImgUrl.append(ImgUrl0)
             # urllib.request.urlretrieve(ImgUrl[number], f"imgs/"+'['+ str(number+1) + '] '+ str(product_title)+".jpg" )
@@ -71,5 +66,6 @@ def product():
         print(r.read())
         r.close
     return(product)
+
 if __name__ == "__main__":
     app.run(host='0.0.0.0')
