@@ -16,8 +16,8 @@ def hello():
 @app.route("/product")
 def product():
     diff=5000
-    product = "돼지고기"
-    # input("상품을 입력하세요 : ")
+    product = input("상품을 입력하세요 : ")
+    # 
     if os.path.isfile("savedata/"+product+".save.txt"):
         mtime = os.path.getmtime("savedata/"+product+".save.txt")
         now=time.time()
@@ -53,11 +53,11 @@ def product():
             product_pr.append(product_price)
             with open("savedata/"+product+".save.txt","a", encoding='utf-8') as f:
                 f.write("[%d] %s %s원\n" % (number+1, product_title, product_price))
-            # ImgUrl0=a[number].replace("//","https://")
-            # ImgUrl.append(ImgUrl0)
-            # urllib.request.urlretrieve(ImgUrl[number], f"imgs/"+'['+ str(number+1) + '] '+ str(product_title)+".jpg" )
+            ImgUrl0=a[number].replace("//","https://")
+            ImgUrl.append(ImgUrl0)
+            urllib.request.urlretrieve(ImgUrl[number], f"imgs/"+'['+ str(number+1) + '] '+ str(product_title)+".jpg" )
             print('['+ str(number+1) + ']', product_title, product_price+'원')
-            # print(ImgUrl[number])
+            print(ImgUrl[number])
             number= number+ 1
             if number==8:
                 break
@@ -66,6 +66,46 @@ def product():
         print(r.read())
         r.close
     return(product)
+@app.route("/news")
+def news():
+    URL='https://news.naver.com/main/list.naver?mode=LS2D&mid=shm&sid2=241&sid1=103&date=20210720&page=1'
+    headers = {"User-Agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.93 Safari/537.36"}
+    res= requests.get(URL, headers=headers)
+    res.raise_for_status()
+    soup= BeautifulSoup(res.text, "lxml")
+    titles = soup.select('#main_content > div > ul > li >dl')
+    number= 0
+    for title in titles:
+        number= number+ 1
+        news_title= title.select('dt>a')
+        if news_title[0].text.lstrip() == "":
+            pt = news_title[1].text
+        else:
+            pt = news_title[0].text
+        news_content= title.select_one('dd > span').text
+        pt=pt.lstrip()
+        pt=pt.rstrip()
+        pt= re.sub('\n ','', pt)
+        news_content= re.sub('\n','', news_content)
+        news_content= news_content.lstrip()
+        print('['+str(number)+'] '+ pt+ '\n'+ news_content)
+        print('--------------------------------------------------------------------------------------------------------')
+    return news_content
+@app.route("/news2")
+def news2():
+    search=input("검색어를 입력하세요 :")
+    raw = requests.get("https://search.naver.com/search.naver?where=news&sm=tab_jum&query="+ search,
+                    headers={'User-Agent':'Mozilla/5.0'})
+    html = BeautifulSoup(raw.text, "html.parser")
 
+    articles = html.select("ul.list_news > li")
+
+    for news in articles:
+        title = news.select_one("a.news_tit").text
+        source = news.select_one("a.api_txt_lines.dsc_txt_wrap").text
+        company = news.select_one("a.info.press").text
+        print('----------------------------------------------------------------------------------')
+        print(title + '----'+ company+'\n----------------------------------------------------------------------------------\n'+source+'\n')
+    return title
 if __name__ == "__main__":
     app.run(host='0.0.0.0')
